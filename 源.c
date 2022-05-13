@@ -1,0 +1,192 @@
+#ifdef _MSC_VER
+#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+#endif
+#include <stdio.h>　　
+#include <Windows.h>
+#include <winbase.h>　
+#define MONITOR_ON -1
+#define MONITOR_OFF 2
+#define MONITOR_STANBY 1
+#define IDR_PAUSE 12
+#define IDR_ABOUT 13
+#define IDR_DELEY 14
+#define IDR_EXIT 15
+#define IDR_HIDE 16
+#define IDR_NOW 17
+LPCTSTR szAppClassName = TEXT("亮熄屏");
+LPCTSTR szAppWindowName = TEXT("亮熄屏beta0.1");
+HMENU hmenu;//菜单句柄
+LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    NOTIFYICONDATA nid;
+    UINT WM_TASKBARCREATED;
+    POINT pt;//用于接收鼠标坐标
+    int xx;//用于接收菜单选项返回值
+    // 不要修改TaskbarCreated，这是系统任务栏自定义的消息
+    WM_TASKBARCREATED = RegisterWindowMessage(TEXT("TaskbarCreated"));
+    switch (message)
+    {
+    case WM_CREATE://窗口创建时候的消息.
+        nid.cbSize = sizeof(nid);
+        nid.hWnd = hwnd;
+        nid.uID = 0;
+        nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+        nid.uCallbackMessage = WM_USER;
+        nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+        lstrcpy(nid.szTip, szAppClassName);
+        Shell_NotifyIcon(NIM_ADD, &nid);
+        hmenu = CreatePopupMenu();//生成菜单
+        AppendMenu(hmenu, MF_STRING, IDR_PAUSE, L"设置");//为菜单添加两个选项
+        AppendMenu(hmenu, MF_STRING, IDR_HIDE, L"隐藏");//为菜单添加两个选项
+        AppendMenu(hmenu, MF_STRING, IDR_NOW, L"立即熄屏");//为菜单添加两个选项
+        AppendMenu(hmenu, MF_STRING, IDR_DELEY, L"延迟一个小时息屏");//为菜单添加两个选项
+        AppendMenu(hmenu, MF_STRING, IDR_ABOUT, L"关于");
+        AppendMenu(hmenu, MF_STRING, IDR_EXIT, L"退出");
+        break;
+    case WM_USER://连续使用该程序时候的消息.
+        if (lParam == WM_LBUTTONDOWN)
+            //MessageBox(hwnd, TEXT("Win32 API 实现系统托盘程序,双击托盘可以退出!"), szAppClassName, MB_OK);
+            if (lParam == WM_LBUTTONDBLCLK)
+                //复位
+                SendMessage(hwnd, WM_SYSCOMMAND, SC_RESTORE, lParam);
+        //ShowWindow(hwnd,SW_SHOWMINNOACTIVE);
+        //双击托盘的消息,退出.
+        //SendMessage(hwnd, WM_CLOSE, wParam, lParam);
+        if (lParam == WM_RBUTTONDOWN)
+        {
+            GetCursorPos(&pt);//取鼠标坐标
+            SetForegroundWindow(hwnd);//解决在菜单外单击左键菜单不消失的问题
+            //EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED);//让菜单中的某一项变灰
+            EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED);
+            EnableMenuItem(hmenu, IDR_HIDE, MF_GRAYED);
+            EnableMenuItem(hmenu, IDR_DELEY, MF_GRAYED);
+            xx = TrackPopupMenu(hmenu, TPM_RETURNCMD, pt.x, pt.y, NULL, hwnd, NULL);//显示菜单并获取选项ID
+            if (xx == IDR_PAUSE) ShowWindow(hwnd, SW_SHOW);
+            if (xx == IDR_ABOUT) MessageBox(hwnd, TEXT("周一至周五早上八点亮屏；下午七点灭屏--hybin"), szAppClassName, MB_OK);
+            if (xx == IDR_EXIT) SendMessage(hwnd, WM_CLOSE, wParam, lParam);
+            if (xx == IDR_HIDE) ShowWindow(hwnd, SW_HIDE);
+            if (xx == IDR_NOW) PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_OFF);
+            if (xx == 0) PostMessage(hwnd, WM_LBUTTONDOWN, NULL, NULL);
+            //MessageBox(hwnd, TEXT("右键"), szAppName, MB_OK);
+        }
+        break;
+    case WM_DESTROY://窗口销毁时候的消息.
+        Shell_NotifyIcon(NIM_DELETE, &nid);
+        PostQuitMessage(0);
+        break;
+    default:
+        /*
+        * 防止当Explorer.exe 崩溃以后，程序在系统系统托盘中的图标就消失
+        *
+        * 原理：Explorer.exe 重新载入后会重建系统任务栏。当系统任务栏建立的时候会向系统内所有
+        * 注册接收TaskbarCreated 消息的顶级窗口发送一条消息，我们只需要捕捉这个消息，并重建系
+        * 统托盘的图标即可。
+        */
+        if (message == WM_TASKBARCREATED)
+            SendMessage(hwnd, WM_CREATE, wParam, lParam);
+        break;
+    }
+    return DefWindowProc(hwnd, message, wParam, lParam);
+}
+int zhu()
+{
+    while (1)
+    {
+        SYSTEMTIME time;
+        SYSTEMTIME clock;
+        GetLocalTime(&time);
+        Sleep(30000);
+        GetLocalTime(&time);
+        printf("今天是星期%2d，时针指向%2d\n", time.wDayOfWeek, time.wHour);
+        if (time.wDayOfWeek == 1 || time.wDayOfWeek == 2 || time.wDayOfWeek == 3 || time.wDayOfWeek == 4 || time.wDayOfWeek == 5)
+        {
+            if (time.wHour == 8)
+            {
+                printf("亮屏");
+                printf("亮屏时间为:%2d\n", time.wHour);
+                lp();
+                //Sleep(30000);
+            }
+            if (time.wHour == 19)
+            {
+                printf("息屏");
+                printf("息屏时间为:%2d\n", time.wHour);
+                xp();
+                //Sleep(30000);
+            }
+        }
+
+    }
+}
+
+
+int main(int argc, char* argv[])
+{
+    //ShowWindow(FindWindow("ConsoleWindowClass", argv[0]), 0);
+    HWND hwnd;
+    MSG msg;
+    WNDCLASS wndclass;
+    HWND handle = FindWindow(NULL, szAppWindowName);
+    if (handle != NULL)
+    {
+        MessageBox(NULL, TEXT("已经有一个实例在运行了！在任务托盘里面。"), szAppClassName, MB_ICONERROR);
+        return 0;
+    }
+    wndclass.style = CS_HREDRAW | CS_VREDRAW;
+    wndclass.lpfnWndProc = WndProc;
+    wndclass.cbClsExtra = 0;
+    wndclass.cbWndExtra = 0;
+    wndclass.hInstance = NULL;
+    wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    wndclass.lpszMenuName = NULL;
+    wndclass.lpszClassName = szAppClassName;
+    if (!RegisterClass(&wndclass))
+    {
+        MessageBox(NULL, TEXT("This program requires Windows NT!"), szAppClassName, MB_ICONERROR);
+        return 0;
+    }
+    // 此处使用WS_EX_TOOLWINDOW 属性来隐藏显示在任务栏上的窗口程序按钮
+    hwnd = CreateWindowEx(WS_EX_TOOLWINDOW,
+        szAppClassName, szAppWindowName,
+        WS_POPUP,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        NULL, NULL, NULL, NULL);
+    ShowWindow(hwnd, 0);
+    UpdateWindow(hwnd);
+    CreateThread(NULL, 0, zhu, NULL, 0, NULL);
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return 0;
+
+}
+
+
+
+int  xp()
+{
+    PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_OFF);
+    return 0;
+}
+int lp()
+{
+    PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_ON);
+    ht();
+    return 0;
+}
+int ht()
+{
+    POINT lpPoint;
+    GetCursorPos(&lpPoint);
+    int mx = lpPoint.x * 65535 / GetSystemMetrics(SM_CXSCREEN);
+    int my = lpPoint.y * 65535 / GetSystemMetrics(SM_CYSCREEN);
+    mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, mx, my, 0, 0);
+}
+
