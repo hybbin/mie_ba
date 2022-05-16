@@ -169,6 +169,16 @@ int main(int argc, char* argv[])
 }
 
 
+//添加注册表开机自启动
+int ziqi()
+{
+    char s[] = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+    HKEY hkey;
+    RegOpenKey(HKEY_CURRENT_USER, s, &hkey);
+    char strModule[256];
+    GetModuleFileName(NULL, strModule, 256);
+    RegSetValueEx(hkey, "亮熄屏", 0, REG_SZ, "strModule", 250);
+}
 
 int  xp()
 {
@@ -189,4 +199,3 @@ int ht()
     int my = lpPoint.y * 65535 / GetSystemMetrics(SM_CYSCREEN);
     mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, mx, my, 0, 0);
 }
-
