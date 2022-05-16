@@ -62,7 +62,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             EnableMenuItem(hmenu, IDR_DELEY, MF_GRAYED);
             xx = TrackPopupMenu(hmenu, TPM_RETURNCMD, pt.x, pt.y, NULL, hwnd, NULL);//显示菜单并获取选项ID
             if (xx == IDR_PAUSE) ShowWindow(hwnd, SW_SHOW);
-            if (xx == IDR_ABOUT) MessageBox(hwnd, TEXT("周一至周五早上八点亮屏；下午七点灭屏--hybin"), szAppClassName, MB_OK);
+            if (xx == IDR_ABOUT) MessageBox(hwnd, TEXT("周一至周五8:30亮屏，19:00熄屏--hybin"), szAppClassName, MB_OK);
             if (xx == IDR_EXIT) SendMessage(hwnd, WM_CLOSE, wParam, lParam);
             if (xx == IDR_HIDE) ShowWindow(hwnd, SW_HIDE);
             if (xx == IDR_NOW) PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_OFF);
@@ -102,10 +102,13 @@ int zhu()
         {
             if (time.wHour == 8)
             {
-                printf("亮屏");
-                printf("亮屏时间为:%2d\n", time.wHour);
-                lp();
-                //Sleep(30000);
+                if (time.wMinute == 30)
+                {
+                    printf("亮屏");
+                    printf("亮屏时间为:%2d\n", time.wHour);
+                    lp();
+                    //Sleep(30000);
+                }
             }
             if (time.wHour == 19)
             {
@@ -123,6 +126,8 @@ int zhu()
 int main(int argc, char* argv[])
 {
     //ShowWindow(FindWindow("ConsoleWindowClass", argv[0]), 0);
+    //添加自启动
+    ziqi();
     HWND hwnd;
     MSG msg;
     WNDCLASS wndclass;
@@ -168,19 +173,37 @@ int main(int argc, char* argv[])
 
 }
 
+//获取当前程序文件目录
+//int lujing()
+//{
+//    char strModule[256];
+//    GetModuleFileNameA(NULL, strModule, 256);//得到当前模块路径
+//    char strWork[1000];
+//    int i = 1000;
+//    GetCurrentDirectoryA(1000, strWork);//得到当前工作路径
+//    printf("当前模块路径: %s \n工作路径：%s \n", strModule, strWork);
+//    getchar();
+//    return strModule;
+//}
 
 //添加注册表开机自启动
 int ziqi()
 {
-    char s[] = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+    //char s[] = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+
     HKEY hkey;
-    RegOpenKey(HKEY_CURRENT_USER, s, &hkey);
-    char strModule[256];
-    GetModuleFileName(NULL, strModule, 256);
-    RegSetValueEx(hkey, "亮熄屏", 0, REG_SZ, "strModule", 250);
+    DWORD ret;
+    ret = RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_ALL_ACCESS, &hkey);
+    if (ret == ERROR_SUCCESS)
+    {
+        TCHAR szModule[MAX_PATH];
+        GetModuleFileName(NULL,szModule,MAX_PATH);
+        ret = RegSetValueEx(hkey, TEXT("亮熄屏"), 0, REG_SZ, (LPBYTE)szModule,(lstrlen(szModule)+1)*sizeof(TCHAR));
+    }
+    RegCloseKey(hkey);
 }
 
-int  xp()
+int xp()
 {
     PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_OFF);
     return 0;
