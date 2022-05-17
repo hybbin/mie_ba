@@ -4,17 +4,16 @@
 #include <stdio.h>　　
 #include <Windows.h>
 #include <winbase.h>　
+#include<conio.h>
 #define MONITOR_ON -1
-#define MONITOR_OFF 2
+#define MONITOR_OFF (LPARAM)2
 #define MONITOR_STANBY 1
 #define IDR_PAUSE 12
 #define IDR_ABOUT 13
-#define IDR_DELEY 14
 #define IDR_EXIT 15
-#define IDR_HIDE 16
-#define IDR_NOW 17
-LPCTSTR szAppClassName = TEXT("亮熄屏");
-LPCTSTR szAppWindowName = TEXT("亮熄屏beta0.1");
+#define IDR_NOW5 17
+LPCTSTR szAppClassName = TEXT("灭霸1.0");
+LPCTSTR szAppWindowName = TEXT("灭霸1.0");
 HMENU hmenu;//菜单句柄
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -37,9 +36,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         Shell_NotifyIcon(NIM_ADD, &nid);
         hmenu = CreatePopupMenu();//生成菜单
         AppendMenu(hmenu, MF_STRING, IDR_PAUSE, L"设置");//为菜单添加两个选项
-        AppendMenu(hmenu, MF_STRING, IDR_HIDE, L"隐藏");//为菜单添加两个选项
-        AppendMenu(hmenu, MF_STRING, IDR_NOW, L"立即熄屏");//为菜单添加两个选项
-        AppendMenu(hmenu, MF_STRING, IDR_DELEY, L"延迟一个小时息屏");//为菜单添加两个选项
+        AppendMenu(hmenu, MF_STRING, IDR_NOW5, L"5秒后熄屏");//为菜单添加两个选项
         AppendMenu(hmenu, MF_STRING, IDR_ABOUT, L"关于");
         AppendMenu(hmenu, MF_STRING, IDR_EXIT, L"退出");
         break;
@@ -58,14 +55,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             SetForegroundWindow(hwnd);//解决在菜单外单击左键菜单不消失的问题
             //EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED);//让菜单中的某一项变灰
             EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED);
-            EnableMenuItem(hmenu, IDR_HIDE, MF_GRAYED);
-            EnableMenuItem(hmenu, IDR_DELEY, MF_GRAYED);
             xx = TrackPopupMenu(hmenu, TPM_RETURNCMD, pt.x, pt.y, NULL, hwnd, NULL);//显示菜单并获取选项ID
             if (xx == IDR_PAUSE) ShowWindow(hwnd, SW_SHOW);
-            if (xx == IDR_ABOUT) MessageBox(hwnd, TEXT("周一至周五8:30亮屏，19:00熄屏--hybin"), szAppClassName, MB_OK);
+            if (xx == IDR_ABOUT) MessageBox(hwnd, TEXT("周一至周五8:30后自动亮屏；\n每天18:30至第二天8:30之前，无人操作电脑后2分钟自动熄屏，有人操作电脑2分钟内不会熄屏。\n--hybin"), szAppClassName, MB_OK);
             if (xx == IDR_EXIT) SendMessage(hwnd, WM_CLOSE, wParam, lParam);
-            if (xx == IDR_HIDE) ShowWindow(hwnd, SW_HIDE);
-            if (xx == IDR_NOW) PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_OFF);
+            if (xx == IDR_NOW5) { Sleep(5000); PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_OFF); }
             if (xx == 0) PostMessage(hwnd, WM_LBUTTONDOWN, NULL, NULL);
             //MessageBox(hwnd, TEXT("右键"), szAppName, MB_OK);
         }
@@ -90,35 +84,46 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 int zhu()
 {
+    SYSTEMTIME time;
+    SYSTEMTIME clock;
+    LASTINPUTINFO lpi;
+    lpi.cbSize = sizeof(lpi);
     while (1)
     {
-        SYSTEMTIME time;
-        SYSTEMTIME clock;
-        GetLocalTime(&time);
-        Sleep(30000);
-        GetLocalTime(&time);
-        printf("今天是星期%2d，时针指向%2d\n", time.wDayOfWeek, time.wHour);
-        if (time.wDayOfWeek == 1 || time.wDayOfWeek == 2 || time.wDayOfWeek == 3 || time.wDayOfWeek == 4 || time.wDayOfWeek == 5)
+        BOOL bVal = GetLastInputInfo(&lpi);
+        if (bVal)
         {
-            if (time.wHour == 8)
+            GetLocalTime(&time);
+            float TimeNub = time.wHour * 100 + time.wMinute;
+            printf("%f", TimeNub);
+            int WorkDay = time.wDayOfWeek;
+            if (TimeNub >= 1830.0 && TimeNub < 830.0)
             {
-                if (time.wMinute == 30)
+                UINT gap = (GetTickCount() - lpi.dwTime) / 1000;
+                if (gap > 120)
                 {
-                    printf("亮屏");
-                    printf("亮屏时间为:%2d\n", time.wHour);
-                    lp();
-                    //Sleep(30000);
+                    printf("用户离开超过2分钟，立即熄屏\n");
+                    xp();
+                }
+                else
+                {
+                    printf("用户离开未超过2分钟\n");
                 }
             }
-            if (time.wHour == 19)
+            if (TimeNub >= 830.0 && TimeNub < 900.0)
             {
-                printf("息屏");
-                printf("息屏时间为:%2d\n", time.wHour);
-                xp();
-                //Sleep(30000);
+                if (WorkDay == 1 || WorkDay == 2 || WorkDay == 3 || WorkDay == 4 || WorkDay == 5)
+                {
+                    printf("上班时间到，该亮屏了\n");
+                    lp();
+                }
+                else
+                {
+                    printf("今天是休息日，不用上班\n");
+                }
             }
         }
-
+        Sleep(2000);
     }
 }
 
