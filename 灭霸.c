@@ -4,8 +4,9 @@
 #include <stdio.h>¡¡¡¡
 #include <Windows.h>
 #include <winbase.h>¡¡
+#include<conio.h>
 #define MONITOR_ON -1
-#define MONITOR_OFF 2
+#define MONITOR_OFF (LPARAM)2
 #define MONITOR_STANBY 1
 #define IDR_PAUSE 12
 #define IDR_ABOUT 13
@@ -88,6 +89,38 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
+
+//int timepanduan()
+//{
+//    SYSTEMTIME time;
+//    SYSTEMTIME clock;
+//    GetLocalTime(&time);
+//    Sleep(30000);
+//    GetLocalTime(&time);
+//    if (time.wHour >= 18 || time.wHour <= 8||time.wHour>8&time.wMinute<30)
+//    {
+//        char ch;
+//        int i = 0;
+//        while (1)
+//        {
+//            if (kbhit())
+//            {
+//                i = 0;
+//            }
+//            else
+//            {
+//                i = i++;
+//                if (i == 30)
+//                {
+//                    xp();
+//                }
+//            }
+//            Sleep(1000);
+//        }
+//
+//    }
+//
+//}
 int zhu()
 {
     while (1)
