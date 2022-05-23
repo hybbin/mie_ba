@@ -191,7 +191,7 @@ int ziqi()
     {
         TCHAR szModule[MAX_PATH];
         GetModuleFileName(NULL,szModule,MAX_PATH);
-        ret = RegSetValueEx(hkey, TEXT("灭霸"), 0, REG_SZ, (LPBYTE)szModule,(lstrlen(szModule)+1)*sizeof(TCHAR));
+        ret = RegSetValueEx(hkey, TEXT("亮熄屏"), 0, REG_SZ, (LPBYTE)szModule,(lstrlen(szModule)+1)*sizeof(TCHAR));
     }
     RegCloseKey(hkey);
 }
