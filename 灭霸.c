@@ -1,9 +1,9 @@
 #ifdef _MSC_VER
 #pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 #endif
-#include <stdio.h>¡¡¡¡
+#include <stdio.h>ã€€ã€€
 #include <Windows.h>
-#include <winbase.h>¡¡
+#include <winbase.h>ã€€
 #include<conio.h>
 #define MONITOR_ON -1
 #define MONITOR_OFF (LPARAM)2
@@ -12,20 +12,20 @@
 #define IDR_ABOUT 13
 #define IDR_EXIT 15
 #define IDR_NOW5 17
-LPCTSTR szAppClassName = TEXT("Ãð°Ô1.0");
-LPCTSTR szAppWindowName = TEXT("Ãð°Ô1.0");
-HMENU hmenu;//²Ëµ¥¾ä±ú
+LPCTSTR szAppClassName = TEXT("ç­éœ¸1.0");
+LPCTSTR szAppWindowName = TEXT("ç­éœ¸1.0");
+HMENU hmenu;//èœå•å¥æŸ„
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     NOTIFYICONDATA nid;
     UINT WM_TASKBARCREATED;
-    POINT pt;//ÓÃÓÚ½ÓÊÕÊó±ê×ø±ê
-    int xx;//ÓÃÓÚ½ÓÊÕ²Ëµ¥Ñ¡Ïî·µ»ØÖµ
-    // ²»ÒªÐÞ¸ÄTaskbarCreated£¬ÕâÊÇÏµÍ³ÈÎÎñÀ¸×Ô¶¨ÒåµÄÏûÏ¢
+    POINT pt;//ç”¨äºŽæŽ¥æ”¶é¼ æ ‡åæ ‡
+    int xx;//ç”¨äºŽæŽ¥æ”¶èœå•é€‰é¡¹è¿”å›žå€¼
+    // ä¸è¦ä¿®æ”¹TaskbarCreatedï¼Œè¿™æ˜¯ç³»ç»Ÿä»»åŠ¡æ è‡ªå®šä¹‰çš„æ¶ˆæ¯
     WM_TASKBARCREATED = RegisterWindowMessage(TEXT("TaskbarCreated"));
     switch (message)
     {
-    case WM_CREATE://´°¿Ú´´½¨Ê±ºòµÄÏûÏ¢.
+    case WM_CREATE://çª—å£åˆ›å»ºæ—¶å€™çš„æ¶ˆæ¯.
         nid.cbSize = sizeof(nid);
         nid.hWnd = hwnd;
         nid.uID = 0;
@@ -34,47 +34,47 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
         lstrcpy(nid.szTip, szAppClassName);
         Shell_NotifyIcon(NIM_ADD, &nid);
-        hmenu = CreatePopupMenu();//Éú³É²Ëµ¥
-        AppendMenu(hmenu, MF_STRING, IDR_PAUSE, L"ÉèÖÃ");//Îª²Ëµ¥Ìí¼ÓÁ½¸öÑ¡Ïî
-        AppendMenu(hmenu, MF_STRING, IDR_NOW5, L"5ÃëºóÏ¨ÆÁ");//Îª²Ëµ¥Ìí¼ÓÁ½¸öÑ¡Ïî
-        AppendMenu(hmenu, MF_STRING, IDR_ABOUT, L"¹ØÓÚ");
-        AppendMenu(hmenu, MF_STRING, IDR_EXIT, L"ÍË³ö");
+        hmenu = CreatePopupMenu();//ç”Ÿæˆèœå•
+        AppendMenu(hmenu, MF_STRING, IDR_PAUSE, L"è®¾ç½®");//ä¸ºèœå•æ·»åŠ ä¸¤ä¸ªé€‰é¡¹
+        AppendMenu(hmenu, MF_STRING, IDR_NOW5, L"5ç§’åŽç†„å±");//ä¸ºèœå•æ·»åŠ ä¸¤ä¸ªé€‰é¡¹
+        AppendMenu(hmenu, MF_STRING, IDR_ABOUT, L"å…³äºŽ");
+        AppendMenu(hmenu, MF_STRING, IDR_EXIT, L"é€€å‡º");
         break;
-    case WM_USER://Á¬ÐøÊ¹ÓÃ¸Ã³ÌÐòÊ±ºòµÄÏûÏ¢.
+    case WM_USER://è¿žç»­ä½¿ç”¨è¯¥ç¨‹åºæ—¶å€™çš„æ¶ˆæ¯.
         if (lParam == WM_LBUTTONDOWN)
-            //MessageBox(hwnd, TEXT("Win32 API ÊµÏÖÏµÍ³ÍÐÅÌ³ÌÐò,Ë«»÷ÍÐÅÌ¿ÉÒÔÍË³ö!"), szAppClassName, MB_OK);
+            //MessageBox(hwnd, TEXT("Win32 API å®žçŽ°ç³»ç»Ÿæ‰˜ç›˜ç¨‹åº,åŒå‡»æ‰˜ç›˜å¯ä»¥é€€å‡º!"), szAppClassName, MB_OK);
             if (lParam == WM_LBUTTONDBLCLK)
-                //¸´Î»
+                //å¤ä½
                 SendMessage(hwnd, WM_SYSCOMMAND, SC_RESTORE, lParam);
         //ShowWindow(hwnd,SW_SHOWMINNOACTIVE);
-        //Ë«»÷ÍÐÅÌµÄÏûÏ¢,ÍË³ö.
+        //åŒå‡»æ‰˜ç›˜çš„æ¶ˆæ¯,é€€å‡º.
         //SendMessage(hwnd, WM_CLOSE, wParam, lParam);
         if (lParam == WM_RBUTTONDOWN)
         {
-            GetCursorPos(&pt);//È¡Êó±ê×ø±ê
-            SetForegroundWindow(hwnd);//½â¾öÔÚ²Ëµ¥Íâµ¥»÷×ó¼ü²Ëµ¥²»ÏûÊ§µÄÎÊÌâ
-            //EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED);//ÈÃ²Ëµ¥ÖÐµÄÄ³Ò»Ïî±ä»Ò
+            GetCursorPos(&pt);//å–é¼ æ ‡åæ ‡
+            SetForegroundWindow(hwnd);//è§£å†³åœ¨èœå•å¤–å•å‡»å·¦é”®èœå•ä¸æ¶ˆå¤±çš„é—®é¢˜
+            //EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED);//è®©èœå•ä¸­çš„æŸä¸€é¡¹å˜ç°
             EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED);
-            xx = TrackPopupMenu(hmenu, TPM_RETURNCMD, pt.x, pt.y, NULL, hwnd, NULL);//ÏÔÊ¾²Ëµ¥²¢»ñÈ¡Ñ¡ÏîID
+            xx = TrackPopupMenu(hmenu, TPM_RETURNCMD, pt.x, pt.y, NULL, hwnd, NULL);//æ˜¾ç¤ºèœå•å¹¶èŽ·å–é€‰é¡¹ID
             if (xx == IDR_PAUSE) ShowWindow(hwnd, SW_SHOW);
-            if (xx == IDR_ABOUT) MessageBox(hwnd, TEXT("ÖÜÒ»ÖÁÖÜÎå8:30ºó×Ô¶¯ÁÁÆÁ£»\nÃ¿Ìì18:30ÖÁµÚ¶þÌì8:30Ö®Ç°£¬ÎÞÈË²Ù×÷µçÄÔºó2·ÖÖÓ×Ô¶¯Ï¨ÆÁ£¬ÓÐÈË²Ù×÷µçÄÔ2·ÖÖÓÄÚ²»»áÏ¨ÆÁ¡£\n--hybin"), szAppClassName, MB_OK);
+            if (xx == IDR_ABOUT) MessageBox(hwnd, TEXT("å‘¨ä¸€è‡³å‘¨äº”8:30åŽè‡ªåŠ¨äº®å±ï¼›\næ¯å¤©18:30è‡³ç¬¬äºŒå¤©8:30ä¹‹å‰ï¼Œæ— äººæ“ä½œç”µè„‘åŽ2åˆ†é’Ÿè‡ªåŠ¨ç†„å±ï¼Œæœ‰äººæ“ä½œç”µè„‘2åˆ†é’Ÿå†…ä¸ä¼šç†„å±ã€‚\n--hybin"), szAppClassName, MB_OK);
             if (xx == IDR_EXIT) SendMessage(hwnd, WM_CLOSE, wParam, lParam);
             if (xx == IDR_NOW5) { Sleep(5000); PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_OFF); }
             if (xx == 0) PostMessage(hwnd, WM_LBUTTONDOWN, NULL, NULL);
-            //MessageBox(hwnd, TEXT("ÓÒ¼ü"), szAppName, MB_OK);
+            //MessageBox(hwnd, TEXT("å³é”®"), szAppName, MB_OK);
         }
         break;
-    case WM_DESTROY://´°¿ÚÏú»ÙÊ±ºòµÄÏûÏ¢.
+    case WM_DESTROY://çª—å£é”€æ¯æ—¶å€™çš„æ¶ˆæ¯.
         Shell_NotifyIcon(NIM_DELETE, &nid);
         PostQuitMessage(0);
         break;
     default:
         /*
-        * ·ÀÖ¹µ±Explorer.exe ±ÀÀ£ÒÔºó£¬³ÌÐòÔÚÏµÍ³ÏµÍ³ÍÐÅÌÖÐµÄÍ¼±ê¾ÍÏûÊ§
+        * é˜²æ­¢å½“Explorer.exe å´©æºƒä»¥åŽï¼Œç¨‹åºåœ¨ç³»ç»Ÿç³»ç»Ÿæ‰˜ç›˜ä¸­çš„å›¾æ ‡å°±æ¶ˆå¤±
         *
-        * Ô­Àí£ºExplorer.exe ÖØÐÂÔØÈëºó»áÖØ½¨ÏµÍ³ÈÎÎñÀ¸¡£µ±ÏµÍ³ÈÎÎñÀ¸½¨Á¢µÄÊ±ºò»áÏòÏµÍ³ÄÚËùÓÐ
-        * ×¢²á½ÓÊÕTaskbarCreated ÏûÏ¢µÄ¶¥¼¶´°¿Ú·¢ËÍÒ»ÌõÏûÏ¢£¬ÎÒÃÇÖ»ÐèÒª²¶×½Õâ¸öÏûÏ¢£¬²¢ÖØ½¨Ïµ
-        * Í³ÍÐÅÌµÄÍ¼±ê¼´¿É¡£
+        * åŽŸç†ï¼šExplorer.exe é‡æ–°è½½å…¥åŽä¼šé‡å»ºç³»ç»Ÿä»»åŠ¡æ ã€‚å½“ç³»ç»Ÿä»»åŠ¡æ å»ºç«‹çš„æ—¶å€™ä¼šå‘ç³»ç»Ÿå†…æ‰€æœ‰
+        * æ³¨å†ŒæŽ¥æ”¶TaskbarCreated æ¶ˆæ¯çš„é¡¶çº§çª—å£å‘é€ä¸€æ¡æ¶ˆæ¯ï¼Œæˆ‘ä»¬åªéœ€è¦æ•æ‰è¿™ä¸ªæ¶ˆæ¯ï¼Œå¹¶é‡å»ºç³»
+        * ç»Ÿæ‰˜ç›˜çš„å›¾æ ‡å³å¯ã€‚
         */
         if (message == WM_TASKBARCREATED)
             SendMessage(hwnd, WM_CREATE, wParam, lParam);
@@ -83,37 +83,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-//int timepanduan()
-//{
-//    SYSTEMTIME time;
-//    SYSTEMTIME clock;
-//    GetLocalTime(&time);
-//    Sleep(30000);
-//    GetLocalTime(&time);
-//    if (time.wHour >= 18 || time.wHour <= 8||time.wHour>8&time.wMinute<30)
-//    {
-//        char ch;
-//        int i = 0;
-//        while (1)
-//        {
-//            if (kbhit())
-//            {
-//                i = 0;
-//            }
-//            else
-//            {
-//                i = i++;
-//                if (i == 30)
-//                {
-//                    xp();
-//                }
-//            }
-//            Sleep(1000);
-//        }
-//
-//    }
-//
-//}
 int zhu()
 {
     SYSTEMTIME time;
@@ -134,24 +103,24 @@ int zhu()
                 UINT gap = (GetTickCount() - lpi.dwTime) / 1000;
                 if (gap > 120)
                 {
-                    printf("ÓÃ»§Àë¿ª³¬¹ý2·ÖÖÓ£¬Á¢¼´Ï¨ÆÁ\n");
+                    printf("ç”¨æˆ·ç¦»å¼€è¶…è¿‡2åˆ†é’Ÿï¼Œç«‹å³ç†„å±\n");
                     xp();
                 }
                 else
                 {
-                    printf("ÓÃ»§Àë¿ªÎ´³¬¹ý2·ÖÖÓ\n");
+                    printf("ç”¨æˆ·ç¦»å¼€æœªè¶…è¿‡2åˆ†é’Ÿ\n");
                 }
             }
             if (TimeNub >= 830.0 && TimeNub < 900.0)
             {
                 if (WorkDay == 1 || WorkDay == 2 || WorkDay == 3 || WorkDay == 4 || WorkDay == 5)
                 {
-                    printf("ÉÏ°àÊ±¼äµ½£¬¸ÃÁÁÆÁÁË\n");
+                    printf("ä¸Šç­æ—¶é—´åˆ°ï¼Œè¯¥äº®å±äº†\n");
                     lp();
                 }
                 else
                 {
-                    printf("½ñÌìÊÇÐÝÏ¢ÈÕ£¬²»ÓÃÉÏ°à\n");
+                    printf("ä»Šå¤©æ˜¯ä¼‘æ¯æ—¥ï¼Œä¸ç”¨ä¸Šç­\n");
                 }
             }
         }
@@ -163,7 +132,7 @@ int zhu()
 int main(int argc, char* argv[])
 {
     //ShowWindow(FindWindow("ConsoleWindowClass", argv[0]), 0);
-    //Ìí¼Ó×ÔÆô¶¯
+    //æ·»åŠ è‡ªå¯åŠ¨
     ziqi();
     HWND hwnd;
     MSG msg;
@@ -171,7 +140,7 @@ int main(int argc, char* argv[])
     HWND handle = FindWindow(NULL, szAppWindowName);
     if (handle != NULL)
     {
-        MessageBox(NULL, TEXT("ÒÑ¾­ÓÐÒ»¸öÊµÀýÔÚÔËÐÐÁË£¡ÔÚÈÎÎñÍÐÅÌÀïÃæ¡£"), szAppClassName, MB_ICONERROR);
+        MessageBox(NULL, TEXT("å·²ç»æœ‰ä¸€ä¸ªå®žä¾‹åœ¨è¿è¡Œäº†ï¼åœ¨ä»»åŠ¡æ‰˜ç›˜é‡Œé¢ã€‚"), szAppClassName, MB_ICONERROR);
         return 0;
     }
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -189,7 +158,7 @@ int main(int argc, char* argv[])
         MessageBox(NULL, TEXT("This program requires Windows NT!"), szAppClassName, MB_ICONERROR);
         return 0;
     }
-    // ´Ë´¦Ê¹ÓÃWS_EX_TOOLWINDOW ÊôÐÔÀ´Òþ²ØÏÔÊ¾ÔÚÈÎÎñÀ¸ÉÏµÄ´°¿Ú³ÌÐò°´Å¥
+    // æ­¤å¤„ä½¿ç”¨WS_EX_TOOLWINDOW å±žæ€§æ¥éšè—æ˜¾ç¤ºåœ¨ä»»åŠ¡æ ä¸Šçš„çª—å£ç¨‹åºæŒ‰é’®
     hwnd = CreateWindowEx(WS_EX_TOOLWINDOW,
         szAppClassName, szAppWindowName,
         WS_POPUP,
@@ -210,20 +179,7 @@ int main(int argc, char* argv[])
 
 }
 
-//»ñÈ¡µ±Ç°³ÌÐòÎÄ¼þÄ¿Â¼
-//int lujing()
-//{
-//    char strModule[256];
-//    GetModuleFileNameA(NULL, strModule, 256);//µÃµ½µ±Ç°Ä£¿éÂ·¾¶
-//    char strWork[1000];
-//    int i = 1000;
-//    GetCurrentDirectoryA(1000, strWork);//µÃµ½µ±Ç°¹¤×÷Â·¾¶
-//    printf("µ±Ç°Ä£¿éÂ·¾¶: %s \n¹¤×÷Â·¾¶£º%s \n", strModule, strWork);
-//    getchar();
-//    return strModule;
-//}
-
-//Ìí¼Ó×¢²á±í¿ª»ú×ÔÆô¶¯
+//æ·»åŠ æ³¨å†Œè¡¨å¼€æœºè‡ªå¯åŠ¨
 int ziqi()
 {
     //char s[] = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
@@ -235,7 +191,7 @@ int ziqi()
     {
         TCHAR szModule[MAX_PATH];
         GetModuleFileName(NULL,szModule,MAX_PATH);
-        ret = RegSetValueEx(hkey, TEXT("ÁÁÏ¨ÆÁ"), 0, REG_SZ, (LPBYTE)szModule,(lstrlen(szModule)+1)*sizeof(TCHAR));
+        ret = RegSetValueEx(hkey, TEXT("äº®ç†„å±"), 0, REG_SZ, (LPBYTE)szModule,(lstrlen(szModule)+1)*sizeof(TCHAR));
     }
     RegCloseKey(hkey);
 }
